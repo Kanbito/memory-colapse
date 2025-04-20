@@ -6,22 +6,30 @@
 <body>
   <h1>Sorria pra foto! 😄</h1>
   <video id="video" width="640" height="480" autoplay></video>
-  <br>
-  <button id="capture">Tirar Foto</button>
   <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
 
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
-    const captureButton = document.getElementById('capture');
 
-    captureButton.addEventListener('click', () => {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/png');
-      alert("Foto tirada! (Confira no console)");
-      console.log("Imagem em Base64:", imageData);
-    });
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+
+        // Aguarda o vídeo estar pronto antes de capturar
+        video.onloadedmetadata = () => {
+          setTimeout(() => {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/png');
+            alert("Foto tirada automaticamente! (Confira no console)");
+            console.log("Imagem em Base64:", imageData);
+          }, 2000); // Espera 2 segundos após carregar o vídeo
+        };
+      })
+      .catch(error => {
+        alert('Permissão negada ou erro ao acessar a câmera.');
+      });
   </script>
 </body>
 </html>
